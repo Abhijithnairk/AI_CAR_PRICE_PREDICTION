@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI VEHICLE PRICE PREDICTION SYSTEM</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e9ecef;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        header {
+            background-color: #007bff;
+            padding: 15px 20px;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+        nav {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        nav a:hover {
+            background-color: #0056b3;
+        }
+        .container {
+            margin: 100px auto 40px auto;
+            padding: 30px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            max-width: 650px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #007bff;
+            margin-bottom: 30px;
+            font-size: 2.2em;
+        }
+        select, input, button {
+            width: 100%;
+            padding: 12px;
+            margin: 12px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .result {
+            margin-top: 25px;
+            font-size: 1.6em;
+            color: #343a40;
+        }
+        footer {
+            background-color: #007bff;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h2>AI VEHICLE PRICE PREDICTION SYSTEM</h2>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/about">About</a>
+        </nav>
+    </header>
+    <div class="container">
+        <h1>Predict Your Car Price</h1>
+        <form id="prediction-form">
+            <select id="car-model" required>
+                <option value="" disabled selected>Select Car Model</option>
+                <option value="ford_Ecosport">ford_Ecosport</option>
+                <option value="Honda_City">Honda_City</option>
+                <option value="Hyundai_Verna">Hyundai_Verna</option>
+                <option value="Tata_Nexon">Tata_Nexon</option>
+                <option value="Suzuki_Swift_VXi">Suzuki_Swift_VXi</option>
+                <option value="Volkswagen_Polo">Volkswagen_Polo</option>
+            </select>
+            <input type="number" id="year" placeholder="Enter Year" required>
+            <input type="number" id="kilometers" placeholder="Enter Kilometers Driven" required>
+            <button type="submit">Predict Price</button>
+        </form>
+        <div class="result" id="result"></div>
+    </div>
+    <footer>
+        <p>&copy; 2024 AI VEHICLE PRICE PREDICTION SYSTEM</p>
+    </footer>
+    <script>
+        document.getElementById('prediction-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const carModel = document.getElementById('car-model').value;
+            const year = document.getElementById('year').value;
+            const kilometers = document.getElementById('kilometers').value;
+
+            // Clear the previous result
+            document.getElementById('result').innerText = '';
+
+            fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                // Add a timestamp to the request body to prevent caching issues
+                body: JSON.stringify({
+                    car_model: carModel,
+                    year: year,
+                    kilometers: kilometers,
+                    timestamp: new Date().getTime() // Add this to prevent caching
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.price) {
+                    document.getElementById('result').innerText = 'Predicted Price: ₹ ' + data.price;
+                } else if (data.error) {
+                    document.getElementById('result').innerText = 'Error: ' + data.error;
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+
+        // Clear result when the user changes any input
+        document.querySelectorAll('select, input').forEach(input => {
+            input.addEventListener('input', () => {
+                document.getElementById('result').innerText = '';
+            });
+        });
+    </script>
+</body>
+</html>
